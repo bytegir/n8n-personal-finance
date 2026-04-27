@@ -1,0 +1,1290 @@
+{
+  "name": "Personal Finance FINAL",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        304
+      ],
+      "id": "7ad42252-53fa-47b9-a903-d6a991184828",
+      "name": "Telegram Trigger",
+      "webhookId": "d1940924-17ad-409b-a3bc-19e1ad28304c",
+      "credentials": {
+        "telegramApi": {
+          "id": "kBXtM2cLE3kfLHtI",
+          "name": "Personal Finance"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        464,
+        752
+      ],
+      "id": "b9a0e25e-d08a-4808-9839-86a0ce147af2",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "v8xb1LuQBSd4sTDD",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"transactions\": {\n      \"type\": \"array\",\n      \"description\": \"List daftar belanjaan atau pemasukan yang diekstrak dari chat\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"item\": {\n            \"type\": \"string\",\n            \"description\": \"Nama barang atau sumber dana\"\n          },\n          \"amount\": {\n            \"type\": \"number\",\n            \"description\": \"Harga atau nominal uang (angka saja)\"\n          },\n          \"category\": {\n            \"type\": \"string\",\n            \"description\": \"Kategori (makanan, transportasi, dll)\"\n          },\n          \"type\": {\n            \"type\": \"string\",\n            \"enum\": [\"masuk\", \"keluar\"],\n            \"description\": \"Tipe transaksi (masuk/keluar)\"\n          }\n        },\n        \"required\": [\"item\", \"amount\", \"category\", \"type\"]\n      }\n    }\n  },\n  \"required\": [\"transactions\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        752
+      ],
+      "id": "cc203308-766d-48a7-8205-4d1392f94fae",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o",
+          "mode": "list",
+          "cachedResultName": "Finance Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1273239336,
+          "mode": "list",
+          "cachedResultName": "siaap, gas projek finance manager.. sekalian bela...",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit#gid=1273239336"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tanggal": "={{ $now.setZone('Asia/Jakarta').toFormat('dd/MM/yyyy') }}",
+            "Jam": "={{ $now.setZone('Asia/Jakarta').toFormat('HH:mm') }}",
+            "Item": "={{ $json.item }}",
+            "Kategori": "={{ $json.category }}",
+            "Masuk": "={{ $json.type === 'masuk' ? $json.amount : 0 }}",
+            "Keluar": "={{ $json.type === 'keluar' ? $json.amount : 0 }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tanggal",
+              "displayName": "Tanggal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Jam",
+              "displayName": "Jam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item",
+              "displayName": "Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kategori",
+              "displayName": "Kategori",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Masuk",
+              "displayName": "Masuk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Keluar",
+              "displayName": "Keluar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        496
+      ],
+      "id": "32758740-cad2-4548-b23c-1f08e2a83bf0",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "hPEPY5ukXyd0TbJR",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Ambil data SHEET (History Lengkap)\n// Karena sekarang di belakang Merge, $input.all() isinya adalah hasil bacaan Get Row\nconst rows = $input.all(); \n\n// 2. Ambil data ITEM BARU (Buat List \"kopi, indomie\")\n// Kita panggil langsung dari node Switch biar aman\nconst switchData = $('Switch').all(); \n\n// Gabungin nama barang buat laporan\nconst currentItemsList = switchData.map(x => x.json.item).join(\", \");\n// Hitung total belanjaan sesi ini\nconst currentTotalBatch = switchData.reduce((acc, curr) => acc + (parseInt(curr.json.amount) || 0), 0);\n\n// --- BAGIAN BAWAH INI SAMA KAYAK KEMARIN (JANGAN DIUBAH) ---\nconst today = DateTime.now().setZone('Asia/Jakarta');\nconst currentMonth = parseInt(today.toFormat('MM'));\nconst currentYear = parseInt(today.toFormat('yyyy'));\nconst INITIAL_LIMIT = 0; \n\nconst cleanNum = (val) => {\n  if (!val) return 0;\n  const bersih = String(val).replace(/[^0-9]+/g, \"\");\n  return parseInt(bersih) || 0;\n};\n\nlet totalKeluar = 0;\nlet totalMasuk = 0;\nlet categoryMap = {}; \n\nfor (const item of rows) {\n  const data = item.json;\n  const tglStr = data.Tanggal;\n\n  if (tglStr) {\n    const parts = tglStr.split('/');\n    // Pastikan format tanggal aman (antisipasi 2/1/2026 atau 02/01/2026)\n    if (parts.length >= 3) {\n       const rowMonth = parseInt(parts[1]); \n       const rowYear = parseInt(parts[2]);\n\n       if (rowMonth === currentMonth && rowYear === currentYear) {\n         const keluar = cleanNum(data.Keluar);\n         const masuk = cleanNum(data.Masuk);\n         totalKeluar += keluar;\n         totalMasuk += masuk;\n\n         if (keluar > 0) {\n           const kat = data.Kategori || \"Lainnya\"; \n           if (!categoryMap[kat]) categoryMap[kat] = 0;\n           categoryMap[kat] += keluar;\n         }\n       }\n    }\n  }\n}\n\n// LOGIKA SISA BUDGET\nconst currentBudget = INITIAL_LIMIT + totalMasuk;\nconst sisaBudget = currentBudget - totalKeluar;\nconst isWarning = sisaBudget < (currentBudget * 0.2);\nconst statusBudget = sisaBudget < 0 ? \"🛑 OVER BUDGET!\" : (isWarning ? \"⚠️ KRITIS\" : \"✅ Aman\");\n\n// SIAPKAN CHART (Sama kayak kemarin)\nconst labels = Object.keys(categoryMap); \nconst values = Object.values(categoryMap);\nconst chartConfig = {\n  type: 'outlabeledPie',\n  data: {\n    labels: labels,\n    datasets: [{\n      data: values,\n      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']\n    }]\n  },\n  options: {\n    plugins: {\n      legend: false,\n      outlabels: { text: '%l %p', color: 'white', stretch: 35, font: { resizable: true, minSize: 12, maxSize: 18 } }\n    }\n  }\n};\nconst chartUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartConfig))}`;\n\n// RETURN FINAL\nreturn {\n  totalKeluar,\n  totalMasuk,\n  saldoBulanIni: sisaBudget,\n  bulan: today.toFormat('MMMM yyyy'),\n  limit: currentBudget,\n  sisaBudget,\n  statusBudget,\n  isWarning,\n  chartUrl,\n  // Data Batch Terbaru\n  currentItem: currentItemsList,\n  currentAmount: currentTotalBatch\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        496
+      ],
+      "id": "807f6e45-77d6-42b1-a7f5-15bb1f6f7f85",
+      "name": "Code in JavaScript",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ae3b9f3a-b7a7-4f88-9b69-443bf3cab237",
+              "leftValue": "={{ $json.isWarning }}",
+              "rightValue": "={{ true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2400,
+        496
+      ],
+      "id": "b82a2839-f2db-4dcb-a1eb-b3aa358387f2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o",
+          "mode": "list",
+          "cachedResultName": "Finance Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1273239336,
+          "mode": "list",
+          "cachedResultName": "siaap, gas projek finance manager.. sekalian bela...",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit#gid=1273239336"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1952,
+        496
+      ],
+      "id": "63d7876c-32a2-452a-ba8c-554f7a1cd52b",
+      "name": "Get row(s) in sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleApi": {
+          "id": "hPEPY5ukXyd0TbJR",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "TELEGRAM_ChatID",
+        "file": "={{ $json.chartUrl }}",
+        "additionalFields": {
+          "caption": "=⚠️ <b>PERINGATAN KEUANGAN!</b> ⚠️  \n\n💰 <b>Sisa Budget:</b> Rp {{ $json.sisaBudget.toLocaleString('id-ID') }} \n🛑 <b>Status:</b> {{ $json.statusBudget }}  \n\n📝 <b>Transaksi Terakhir:</b> {{ $json.currentItem }}\n(Nominal: \nRp {{ $json.currentAmount }}\n\nTahan dulu jajannya ya, nunggu gajian bulan depan! 😭🙏",
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2624,
+        400
+      ],
+      "id": "b9bb2272-6b0e-447e-a4fd-45244aca2436",
+      "name": "Send a photo message",
+      "webhookId": "f4bcfaa2-ecef-49a8-bcfe-7bcbb14dab66",
+      "credentials": {
+        "telegramApi": {
+          "id": "kBXtM2cLE3kfLHtI",
+          "name": "Personal Finance"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "TELEGRAM_ChatID",
+        "file": "={{ $json.chartUrl }}",
+        "additionalFields": {
+          "caption": "=✅ <b>BERHASIL DICATAT!</b>\n\n🛒 <b>Item:</b> {{ $json.currentItem }}\n💰 <b>Nominal:</b> Rp {{ $json.currentAmount }}\n\n---\n📊 <b>Rekap Bulan Ini:</b>\n💎 <b>Sisa Budget:</b> Rp {{ $json.sisaBudget.toLocaleString('id-ID') }}\n😎 <b>Status:</b> Aman, gas terus!\n\n",
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2624,
+        592
+      ],
+      "id": "4bced897-9727-4b30-be74-ffb40049489c",
+      "name": "Send a photo message1",
+      "webhookId": "b5ab0a4a-0e53-4b4d-adbe-c01d69fbe187",
+      "credentials": {
+        "telegramApi": {
+          "id": "kBXtM2cLE3kfLHtI",
+          "name": "Personal Finance"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1264,
+        816
+      ],
+      "id": "bde2153c-2512-4e91-9c05-a072baf85df7",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o",
+          "mode": "list",
+          "cachedResultName": "Finance Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1273239336,
+          "mode": "list",
+          "cachedResultName": "siaap, gas projek finance manager.. sekalian bela...",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit#gid=1273239336"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        816
+      ],
+      "id": "f701d70d-73a1-4aa2-9a3e-e41b8587dd16",
+      "name": "Get row(s) in sheet1",
+      "executeOnce": true,
+      "credentials": {
+        "googleApi": {
+          "id": "hPEPY5ukXyd0TbJR",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Ambil semua data & Set Waktu Jakarta\nconst rows = $input.all();\nconst now = DateTime.now().setZone('Asia/Jakarta');\n\n// 2. MUNDUR SATU BULAN (Logika Tutup Buku) ⏪\nconst lastMonthDate = now.minus({ months: 1 }); \n\n// 🚨 UPDATE 1: Ubah Target jadi ANGKA (Int) biar \"01\" jadi 1\nconst targetMonth = parseInt(lastMonthDate.toFormat('MM'));\nconst targetYear = parseInt(lastMonthDate.toFormat('yyyy'));\nconst namaBulanLalu = lastMonthDate.toFormat('MMMM yyyy'); \n\n// 3. Fungsi Pembersih\nconst cleanNum = (val) => {\n  if (!val) return 0;\n  const bersih = String(val).replace(/[^0-9]+/g, \"\");\n  return parseInt(bersih) || 0;\n};\n\nlet totalKeluar = 0;\nlet totalMasuk = 0;\nlet categoryMap = {}; \n\n// 4. Looping & Filter\nfor (const item of rows) {\n  const data = item.json;\n  const tglStr = data.Tanggal;\n\n  if (tglStr) {\n    const parts = tglStr.split('/');\n    // Pastikan format tanggal valid (antisipasi array kosong)\n    if (parts.length >= 3) {\n        // 🚨 UPDATE 2: Ubah Data Sheet jadi ANGKA juga\n        const rowMonth = parseInt(parts[1]);\n        const rowYear = parseInt(parts[2]);\n\n        // FILTER: Bandingkan Angka vs Angka (1 === 1) ✅ Aman\n        if (rowMonth === targetMonth && rowYear === targetYear) {\n          const keluar = cleanNum(data.Keluar);\n          const masuk = cleanNum(data.Masuk);\n          \n          totalKeluar += keluar;\n          totalMasuk += masuk;\n\n          // Grouping Kategori\n          if (keluar > 0) {\n            // Kita bikin lowercase biar \"Makan\" dan \"makan\" jadi satu\n            const kat = (data.Kategori || \"Lainnya\").toLowerCase(); \n            if (!categoryMap[kat]) categoryMap[kat] = 0;\n            categoryMap[kat] += keluar;\n          }\n        }\n    }\n  }\n}\n\n// 5. Hitung Neraca Akhir\nconst cashFlow = totalMasuk - totalKeluar;\nconst statusKeuangan = cashFlow >= 0 ? \"🤑 SURPLUS (Untung)\" : \"😭 DEFISIT (Buntung)\";\n\n// 6. Bikin Grafik Pie Chart\nconst labels = Object.keys(categoryMap); \nconst values = Object.values(categoryMap);\n\nconst chartConfig = {\n  type: 'outlabeledPie',\n  data: {\n    labels: labels,\n    datasets: [{\n      data: values,\n      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']\n    }]\n  },\n  options: {\n    plugins: {\n      legend: false,\n      outlabels: {\n        text: '%l %p',\n        color: 'white',\n        stretch: 35,\n        font: { resizable: true, minSize: 12, maxSize: 18 }\n      }\n    }\n  }\n};\n\nconst chartUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartConfig))}`;\n\nreturn {\n  bulanLaporan: namaBulanLalu,\n  totalMasuk,\n  totalKeluar,\n  cashFlow,\n  statusKeuangan,\n  chartUrl\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        816
+      ],
+      "id": "3701f11f-6e98-4065-822e-bcb41516db82",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "TELEGRAM_ChatID",
+        "file": "={{ $json.chartUrl }}",
+        "additionalFields": {
+          "caption": "=📑 <b>LAPORAN TUTUP BUKU</b>\n🗓️ <b>Periode:</b> {{ $json.bulanLaporan }}\n\n---\n💵 <b>Pemasukan:</b> Rp {{ $json.totalMasuk.toLocaleString('id-ID') }}\n💸 <b>Pengeluaran:</b> Rp {{ $json.totalKeluar.toLocaleString('id-ID') }}\n\n📊 <b>NERACA AKHIR:</b>\nRp {{ $json.cashFlow.toLocaleString('id-ID') }}\n<b>Status:</b> {{ $json.statusKeuangan }}\n\n---\n<i>Data sudah di-reset. Selamat menjalani bulan baru! 🚀</i>",
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1936,
+        816
+      ],
+      "id": "929aaa6b-8586-4059-9860-a9e073474549",
+      "name": "Send a photo message2",
+      "webhookId": "4e6fba7c-0cc6-4f41-9947-f5fd4dfc02ac",
+      "credentials": {
+        "telegramApi": {
+          "id": "kBXtM2cLE3kfLHtI",
+          "name": "Personal Finance"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ !$json.item || !$json.amount || $json.amount == 0 }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "3dd64203-d2f8-4aa8-b223-bc8e923085aa"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "🚫 Error"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f2537b8d-f652-45c2-b157-89c49fe6c83a",
+                    "leftValue": "={{ !$json.item || !$json.amount || $json.amount == 0 }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "✅ Lolos"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        448
+      ],
+      "id": "775b9487-ffba-4396-8bff-5ebb6dc10784",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "content": "## Scheduler (bulanan)",
+        "height": 272,
+        "width": 944
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        736
+      ],
+      "typeVersion": 1,
+      "id": "80e62f60-d046-46d3-a35f-d1323c874421",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Output",
+        "height": 352,
+        "width": 1600,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "b5757e9f-e6c4-49a8-a1fa-235f3f86730a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.transactions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        848,
+        544
+      ],
+      "id": "fb2c567e-8bb3-4e96-9b43-db4865b66bb8",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        496
+      ],
+      "id": "3f4e2289-3fbf-4059-b7cc-dfc6ecaeb936",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1504,
+        240
+      ],
+      "id": "d04c4e1b-7aee-4e52-8f87-91f56f53f5c4",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil semua sampah error yang terkumpul\nconst errors = $input.all();\n\nlet missingPrice = [];\nlet missingName = [];\n\nfor (const err of errors) {\n  const data = err.json;\n  \n  // Cek kenapa dia gagal\n  // Kalau itemnya ada tapi harganya 0/kosong -> Masalah Harga\n  if (data.item && (!data.amount || data.amount === 0)) {\n    missingPrice.push(data.item);\n  } \n  // Kalau itemnya kosong -> Masalah Nama\n  else {\n    missingName.push(\"Barang tanpa nama\"); // atau ambil raw text kalau ada\n  }\n}\n\n// Bikin Pesan Laporan\nlet message = \"⚠️ **LAPORAN GAGAL INPUT** ⚠️\\n\";\n\nif (missingPrice.length > 0) {\n  message += `\\n💸 **Lupa Harga:**\\n- ${missingPrice.join(\"\\n- \")}`;\n}\n\nif (missingName.length > 0) {\n  message += `\\n👻 **Lupa Nama Barang:**\\nAda ${missingName.length} item ga jelas.`;\n}\n\nmessage += \"\\n\\nCek lagi chatnya ya Bos! 🗿\";\n\nreturn { message };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        240
+      ],
+      "id": "9b3b9452-c8b7-4ea4-9d45-2a90e1e23bf5",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "chatId": "TELEGRAM_ChatID",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1952,
+        240
+      ],
+      "id": "9c2bbdb5-27b5-4356-a3e0-096ee4ed0e09",
+      "name": "Send a text message",
+      "webhookId": "7628d17e-c92b-4bd8-b62a-52066d8082f6",
+      "credentials": {
+        "telegramApi": {
+          "id": "kBXtM2cLE3kfLHtI",
+          "name": "Personal Finance"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8d310930-7c9b-4506-8cc9-b35064f9aa69",
+              "leftValue": "={{ $json.message.photo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        48,
+        400
+      ],
+      "id": "69b0ca74-39b9-4083-8e00-8a21f22cd24c",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3849a0e7-ace3-47a9-8136-e2ed2ec24f94",
+              "leftValue": "={{ $json.message.text.toLowerCase() }}",
+              "rightValue": "/undo",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -176,
+        304
+      ],
+      "id": "483d209e-fe8c-4a67-9060-e16903ac3139",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o",
+          "mode": "list",
+          "cachedResultName": "Finance Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1273239336,
+          "mode": "list",
+          "cachedResultName": "siaap, gas projek finance manager.. sekalian bela...",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit#gid=1273239336"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        48
+      ],
+      "id": "0349d5ae-4313-40a4-a385-1ec978d67fb2",
+      "name": "Get row(s) in sheet2",
+      "credentials": {
+        "googleApi": {
+          "id": "hPEPY5ukXyd0TbJR",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Ambil semua data dari node Google Sheet sebelumnya\nconst rows = $input.all();\n\n// 2. Cek kalau sheet kosong\nif (rows.length === 0) {\n  return { json: { status: \"kosong\" } };\n}\n\n// 3. Ambil baris TERAKHIR\nconst lastItem = rows[rows.length - 1];\n\n// 4. Deteksi Harga (Cek kolom 'Keluar' dulu, kalau kosong cek 'Masuk')\n// Ingat: Di Spreadsheet kamu kolomnya \"Masuk\" & \"Keluar\", bukan Amount.\nconst harga = lastItem.json.Keluar || lastItem.json.Masuk || 0; \n\n// 5. Return paket lengkap biar Telegram bisa baca\nreturn {\n  json: {\n    target_row: lastItem.json.row_number, // Buat Delete Row\n    item_name: lastItem.json.Item,        // Buat Laporan Nama\n    item_price: harga                     // Buat Laporan Harga (INI YANG BARU)\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        48
+      ],
+      "id": "0310d51b-a75a-4b86-aec1-2760845795cb",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o",
+          "mode": "list",
+          "cachedResultName": "Finance Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1273239336,
+          "mode": "list",
+          "cachedResultName": "siaap, gas projek finance manager.. sekalian bela...",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit#gid=1273239336"
+        },
+        "startIndex": "={{ $json.target_row }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        48
+      ],
+      "id": "1edd4be9-4e2e-4b4d-ad24-4b1596cca0e6",
+      "name": "Delete rows or columns from sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "hPEPY5ukXyd0TbJR",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "TELEGRAM_ChatID",
+        "text": "=🗑️ Siap Bos! Item terakhir: {{ $('Code in JavaScript3').item.json.item_name }} ({{ $('Code in JavaScript3').item.json.item_price }}) sudah dihapus dari database.\n\nMenghitung ulang saldo...",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        48
+      ],
+      "id": "76294dde-bbe2-4bdc-a0a2-de315d5bb52b",
+      "name": "Send a text message1",
+      "webhookId": "1fe13457-711c-4525-9d60-7b3af29157fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "kBXtM2cLE3kfLHtI",
+          "name": "Personal Finance"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Ambil data SHEET (Database Paling Update setelah Delete)\nconst rows = $input.all(); \n\n// --- SETUP TANGGAL (VERSI VANILLA JS) ---\n// Kita pakai Date bawaan, gak perlu require modul aneh-aneh\nconst now = new Date();\nconst currentMonth = now.getMonth() + 1; // JS ngitung bulan dari 0 (Jan=0), jadi harus +1\nconst currentYear = now.getFullYear();\nconst INITIAL_LIMIT = 0; // Sesuaikan limit kamu\n\n// Fungsi pembersih angka (tetap sama)\nconst cleanNum = (val) => {\n  if (!val) return 0;\n  const bersih = String(val).replace(/[^0-9]+/g, \"\");\n  return parseInt(bersih) || 0;\n};\n\n// --- LOGIKA HITUNG DUIT ---\nlet totalKeluar = 0;\nlet totalMasuk = 0;\n\nfor (const item of rows) {\n  const data = item.json;\n  const tglStr = data.Tanggal;\n\n  if (tglStr) {\n    // Format di sheet kamu: DD/MM/YYYY (contoh: 26/12/2025)\n    const parts = tglStr.split('/');\n    if (parts.length >= 3) {\n       const rowMonth = parseInt(parts[1]); \n       const rowYear = parseInt(parts[2]);\n\n       // Cek apakah bulan & tahun sama dengan sekarang\n       if (rowMonth === currentMonth && rowYear === currentYear) {\n         totalKeluar += cleanNum(data.Keluar);\n         totalMasuk += cleanNum(data.Masuk);\n       }\n    }\n  }\n}\n\n// --- LOGIKA SISA BUDGET & STATUS ---\nconst currentBudget = INITIAL_LIMIT + totalMasuk;\nconst sisaBudget = currentBudget - totalKeluar;\nconst isWarning = sisaBudget < (currentBudget * 0.2);\nconst statusBudget = sisaBudget < 0 ? \"🛑 OVER BUDGET!\" : (isWarning ? \"⚠️ KRITIS\" : \"✅ Aman\");\n\n// Format Bulan biar kebaca manusia (Gak wajib, tapi bagus)\nconst namaBulan = now.toLocaleString('default', { month: 'long' });\n\n// --- RETURN FINAL ---\nreturn {\n  totalKeluar,\n  totalMasuk,\n  // 👇 UBAH BARIS INI (Tambahin .toLocaleString('id-ID'))\n  saldo: sisaBudget.toLocaleString('id-ID'),      \n  status: statusBudget,\n  bulan: `${namaBulan} ${currentYear}`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        48
+      ],
+      "id": "b83867de-f8bc-497a-a382-1c37b88ad5ca",
+      "name": "Code in JavaScript4",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o",
+          "mode": "list",
+          "cachedResultName": "Finance Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1273239336,
+          "mode": "list",
+          "cachedResultName": "siaap, gas projek finance manager.. sekalian bela...",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c6GWy9eszzP5tp_pCeelTX2-MSbpVikP9v8ZEfsEE1o/edit#gid=1273239336"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1072,
+        48
+      ],
+      "id": "58633393-c631-4b78-b368-e7fa3a5a6e73",
+      "name": "Get row(s) in sheet3",
+      "executeOnce": false,
+      "credentials": {
+        "googleApi": {
+          "id": "hPEPY5ukXyd0TbJR",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "TELEGRAM_ChatID",
+        "text": "=✅ UNDO BERHASIL\n\nItem dihapus: {{ $('Code in JavaScript3').first().json.item_name }}\nNominal: {{ $('Code in JavaScript3').first().json.item_price }}\n\n💰 Info Saldo\nSisa: Rp {{ $json.saldo }}\nStatus: {{ $json.status }}\n\nAman Bos! Kesalahan sudah diperbaiki, dompet jadi lebih bernapas lega. 👌",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        48
+      ],
+      "id": "c0ef0455-e4bb-4a38-be0f-7ef582541782",
+      "name": "Send a text message2",
+      "webhookId": "b5ab0a4a-0e53-4b4d-adbe-c01d69fbe187",
+      "credentials": {
+        "telegramApi": {
+          "id": "kBXtM2cLE3kfLHtI",
+          "name": "Personal Finance"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=AIzaSyBXngPDjcYY1aU2K6OeYtwyivuq05zaL4Q",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Analisa gambar struk ini. Ekstrak data: Item (nama barang), Amount (total harga angka saja), Category (Makanan/Minuman/Lainnya), Type (keluar). JANGAN GUNAKAN MARKDOWN. HANYA JSON MURNI.\"\n        },\n        {\n          \"inline_data\": {\n            \"mime_type\": \"image/jpeg\",\n            \"data\": \"{{ $json.my_image }}\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        656,
+        304
+      ],
+      "id": "ecd31dc9-6e2e-4e8f-b025-0f2508fb80fb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "my_image",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        304
+      ],
+      "id": "d9682005-870c-4378-994e-72e427cc00e1",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Ambil output mentah dari Gemini\nconst response = $('HTTP Request').first();\nconst rawText = response.json.candidates[0].content.parts[0].text;\n\n// 2. Bersihin Markdown\nconst cleanText = rawText.replace(/```json|```/g, '').trim();\n\nlet items = [];\n\ntry {\n  const parsed = JSON.parse(cleanText);\n  \n  // 3. CEK KARDUS: Apakah ini Array (Banyak Barang) atau Object (Satu Barang)?\n  if (Array.isArray(parsed)) {\n    items = parsed; // Kalau banyak, ambil semua\n  } else {\n    items = [parsed]; // Kalau satu, bungkus jadi array biar seragam\n  }\n\n  // 4. MAP DATA: Standarisasi semua item biar siap masuk Sheet\n  return items.map(data => {\n    return {\n      json: {\n        // Samain variablenya dengan input manual (huruf kecil)\n        item: data.Item || data.item || \"Barang Tak Terbaca\",\n        amount: data.Amount || data.amount || data.Harga || 0,\n        kategori: data.Category || data.category || \"Lainnya\",\n        \n        // Data pelengkap\n        tanggal: new Date().toLocaleDateString('id-ID'),\n        jam: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),\n        type: \"keluar\"\n      }\n    }\n  });\n\n} catch (error) {\n  return {\n    json: {\n      error: \"Gagal parsing JSON\",\n      raw: rawText\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        304
+      ],
+      "id": "e2a8bdda-a384-4fc1-bade-a96bd24d71e2",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "content": "## Error output",
+        "width": 912,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "a18fc4f4-db84-4de9-bf94-5ed7e3d33727",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Text input",
+        "height": 432,
+        "width": 816,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        464
+      ],
+      "typeVersion": 1,
+      "id": "0f8aa240-bb15-4ed0-91a0-0f95b2d82afd",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Image input",
+        "height": 240,
+        "width": 816,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "1240272d-d1aa-4dc7-89c4-d344499f36a9",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Undo/delete latest row",
+        "height": 224,
+        "width": 1728,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "e05cdd23-3005-450c-bd04-6c9e6e71e141",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Kamu adalah Akuntan Pribadi yang ahli dan sangat teliti. Tugas utamamu adalah mengekstrak informasi keuangan dari pesan singkat pengguna menjadi data terstruktur.  Identifikasi variabel berikut dari pesan: \n1. item: Nama barang spesifik yang dibeli (CONTOH: Jika user beli 'Kopi', tulis 'Kopi', JANGAN diringkas menjadi 'Makanan'). \n2. amount: Nominal uang (ubah menjadi angka murni, hilangkan teks \"rb\", \"juta\", \"ribu\", atau simbol \"Rp\"). \n3. category: Pilih kategori yang paling sesuai (Makan, Transport, Belanja, Tagihan, Hiburan, Pendapatan, atau Lainnya). \n4. type: Tentukan jenis transaksi. Gunakan nilai 'keluar' untuk pengeluaran (expense) dan 'masuk' untuk pemasukan (income).  \n\nAturan konversi angka: \n- Jika user menulis \"25rb\", ubah otomatis menjadi 25000. \n- Jika user menulis \"100k\", ubah otomatis menjadi 100000. \n- Jika user menulis \"1.5jt\", ubah otomatis menjadi 1500000.\n\nATURAN TAMBAHAN:\nJika user input: \"Beli [Angka]\" atau \"Jajan [Angka]\" TANPA nama barang spesifik,\nMaka output field 'item' harus string kosong (\"\").\nJangan jadikan kata kerja \"beli/jajan\" sebagai nama item.\n\nATURAN KHUSUS PEMASUKAN:\nJika kategori adalah \"Pemasukan\" (Income) dan user tidak menyebut sumber spesifik (hanya bilang \"dapet duit\", \"uang masuk\"), maka ISI field 'item' dengan kata: \"Uang Masuk\".\nJANGAN BIARKAN ITEM KOSONG UNTUK PEMASUKAN."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.8,
+      "position": [
+        464,
+        544
+      ],
+      "id": "09317fe2-6908-4048-950e-47f159d9c5af",
+      "name": "Basic LLM Chain"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a photo message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Delete rows or columns from sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete rows or columns from sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "2a51e8cc-1bf6-419a-8aa4-ec068a3bb2da",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9e878594a760165e7cd58d32fc1f8cedb951e19dfc74db16e2b8a5d262506736"
+  },
+  "id": "kmHIJAIVi7nELH2t",
+  "tags": []
+}
